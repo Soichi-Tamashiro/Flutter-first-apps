@@ -60,6 +60,27 @@ class _BottomNavBarState extends State<BottomNavBar> {
   String basename;
   // Future<Directory> _externalDocumentsDirectory;
 
+  Future readImage() async {
+    Directory dir = await getExternalStorageDirectory();
+    String strdir = dir.path + '/Pictures';
+    final dir2 = Directory(strdir);
+    print(dir2);
+    // execute an action on each entry
+    final files = await dir2.list().toList();
+    files.forEach((f) {
+      // print(f);
+      String myFilepath = f.path;
+      String myFile = f.path.split("/")?.last;
+      print(myFile);
+      print(myFile.length);
+      if (myFile.length > 30) {
+        final eraseFile = Directory(myFilepath);
+        eraseFile.deleteSync(recursive: true);
+      }
+      ;
+    });
+  }
+
   Future getImage(ImgSource source) async {
     var image = await ImagePickerGC.pickImage(
         context: context,
@@ -73,31 +94,50 @@ class _BottomNavBarState extends State<BottomNavBar> {
           style: TextStyle(color: Colors.red),
         ) //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
         );
+    Directory filepath = await getExternalStorageDirectory();
+    // Directory tempDir = await getTemporaryDirectory();
+    if (filepath == null) {
+      return null;
+    }
     setState(() {
-      _image = image;
-      String basename = _image.path;
-      String basename_last = _image.path.split("/")?.last;
-      // print(basename);
-      // replaceAll(basename, basename_last);
-      String newDirect = basename.replaceFirst(basename_last, "");
-      // print(newDirect);
-      var now = new DateTime.now();
-      var formatter = new DateFormat('yyyy-MM-dd_HH-mm-ss');
-      String formattedDate = formatter.format(now);
-      // print(formattedDate); // 2020-09-06_18-16-01
-      String mPath = newDirect + '${formattedDate}_receta.jpg';
-      print(mPath);
-      // getExternalStorageDirectory();
-      // String imgType = path.split('.').last;
-      // String mPath =
-      //     '${directory.path.toString()}/${DateTime.now()}_receta.$imgType';
-      // String mPath =
-      //     '${getExternalStorageDirectory()}/Pictures/${DateTime.now()}_receta.jpg';
-      // var myFile = new File(
-      //     '${getExternalStorageDirectory()}/${DateTime.now()}_receta.jpg');
-      // myFile = image;
-      _image = _image.renameSync(mPath);
-      // _image = image;
+      try {
+        _image = image;
+        String basename = _image.path;
+        String basename_last = _image.path.split("/")?.last;
+        // print(basename);
+        // replaceAll(basename, basename_last);
+        String newDirect = basename.replaceFirst(basename_last, "");
+        // print(newDirect);
+        var now = new DateTime.now();
+        var formatter = new DateFormat('yyyy-MM-dd_HH-mm-ss');
+        String formattedDate = formatter.format(now);
+        // print(formattedDate); // 2020-09-06_18-16-01
+        String mPath = newDirect + '${formattedDate}_receta.jpg';
+        print(mPath);
+        // getExternalStorageDirectory();
+        // String imgType = path.split('.').last;
+        // String mPath =
+        //     '${directory.path.toString()}/${DateTime.now()}_receta.$imgType';
+        // String mPath =
+        //     '${getExternalStorageDirectory()}/Pictures/${DateTime.now()}_receta.jpg';
+        // var myFile = new File(
+        //     '${getExternalStorageDirectory()}/${DateTime.now()}_receta.jpg');
+        // myFile = image;
+        _image = _image.renameSync(mPath);
+        // _image = image;
+      } catch (e) {
+        //
+      }
+      if (_image == null) {
+        print("no hay imagen");
+        print(filepath);
+        return;
+        // final String dirPath = image.path;
+        // final dir = Directory(dirPath);
+        // String dir = '${getLibraryDirectory()}/Pictures/';
+        // print(dir);
+        // dir.deleteSync(recursive: true);
+      }
     });
   }
 
@@ -153,6 +193,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
               _currentIndex = index;
               if (_currentIndex == 1) {
                 getImage(ImgSource.Camera);
+              }
+              if (_currentIndex == 0) {
+                readImage();
               }
             });
           }),
