@@ -58,9 +58,25 @@ class _BottomNavBarState extends State<BottomNavBar> {
   int _currentIndex = 0;
   File _image;
   String basename;
+  String myNewPhoto;
+  List<String> fileattachmentList = [];
   // Future<Directory> _externalDocumentsDirectory;
 
-  Future readImage() async {
+  Future updatePhotos(ImgSource source) async {
+    var image = await ImagePickerGC.pickImage(
+      context: context,
+      source: source,
+      cameraIcon: Icon(
+        Icons.add,
+        color: Colors.red,
+      ), //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
+    );
+    setState(() {
+      _image = image;
+    });
+  }
+
+  Future eraseCorruptedImage() async {
     Directory dir = await getExternalStorageDirectory();
     String strdir = dir.path + '/Pictures';
     final dir2 = Directory(strdir);
@@ -71,8 +87,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
       // print(f);
       String myFilepath = f.path;
       String myFile = f.path.split("/")?.last;
-      print(myFile);
-      print(myFile.length);
+      // print(myFile);
+      // print(myFile.length);
       if (myFile.length > 30) {
         final eraseFile = Directory(myFilepath);
         eraseFile.deleteSync(recursive: true);
@@ -114,6 +130,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         // print(formattedDate); // 2020-09-06_18-16-01
         String mPath = newDirect + '${formattedDate}_receta.jpg';
         print(mPath);
+        myNewPhoto = mPath;
         // getExternalStorageDirectory();
         // String imgType = path.split('.').last;
         // String mPath =
@@ -128,20 +145,24 @@ class _BottomNavBarState extends State<BottomNavBar> {
       } catch (e) {
         //
       }
-      if (_image == null) {
-        print("no hay imagen");
-        print(filepath);
-        return;
-        // final String dirPath = image.path;
-        // final dir = Directory(dirPath);
-        // String dir = '${getLibraryDirectory()}/Pictures/';
-        // print(dir);
-        // dir.deleteSync(recursive: true);
-      }
+      eraseCorruptedImage();
+      // if (_image == null) {
+      //   print("no hay imagen");
+      //   print(filepath);
+      //   return;
+      //   // final String dirPath = image.path;
+      //   // final dir = Directory(dirPath);
+      //   // String dir = '${getLibraryDirectory()}/Pictures/';
+      //   // print(dir);
+      //   // dir.deleteSync(recursive: true);
+      // }
     });
   }
 
   final tabs = [
+    // FileListPreviewer(
+    //   filePaths: fileattachmentList,
+    // ),
     Center(
       child: Text('Galleria'),
     ),
@@ -195,7 +216,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 getImage(ImgSource.Camera);
               }
               if (_currentIndex == 0) {
-                readImage();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SecondRoute()),
+                );
+                // updatePhotos(ImgSource.Gallery);
               }
             });
           }),
@@ -216,5 +241,41 @@ class _BottomNavBarState extends State<BottomNavBar> {
     //     }
     //   });
     // }
+  }
+}
+
+class SecondRoute extends StatelessWidget {
+  int _currentIndex = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Second Route"),
+      ),
+      body: Center(),
+      bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.photo_library),
+              title: Text('Galería'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add_a_photo),
+              title: Text('Nueva Receta'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              title: Text('Buscar Receta'),
+            ),
+          ],
+          selectedItemColor: Colors.amber[800],
+          onTap: (index) {
+            _currentIndex = index;
+            if (_currentIndex == 1) {
+              Navigator.pop(context);
+            }
+          }),
+    );
   }
 }
