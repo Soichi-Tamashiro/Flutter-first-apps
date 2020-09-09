@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: BottomNavBar(title: 'Recetas'),
+      home: BottomNavBar(title: 'Mis Recetas'),
     );
   }
 }
@@ -55,7 +55,7 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
   File _image;
   String basename;
   String myNewPhoto;
@@ -131,31 +131,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
         String mPath = newDirect + '${formattedDate}_receta.jpg';
         print(mPath);
         myNewPhoto = mPath;
-        // getExternalStorageDirectory();
-        // String imgType = path.split('.').last;
-        // String mPath =
-        //     '${directory.path.toString()}/${DateTime.now()}_receta.$imgType';
-        // String mPath =
-        //     '${getExternalStorageDirectory()}/Pictures/${DateTime.now()}_receta.jpg';
-        // var myFile = new File(
-        //     '${getExternalStorageDirectory()}/${DateTime.now()}_receta.jpg');
-        // myFile = image;
         _image = _image.renameSync(mPath);
-        // _image = image;
       } catch (e) {
         //
       }
       eraseCorruptedImage();
-      // if (_image == null) {
-      //   print("no hay imagen");
-      //   print(filepath);
-      //   return;
-      //   // final String dirPath = image.path;
-      //   // final dir = Directory(dirPath);
-      //   // String dir = '${getLibraryDirectory()}/Pictures/';
-      //   // print(dir);
-      //   // dir.deleteSync(recursive: true);
-      // }
     });
   }
 
@@ -191,7 +171,20 @@ class _BottomNavBarState extends State<BottomNavBar> {
         title: Text(widget.title),
         centerTitle: true,
       ),
-      body: tabs[_currentIndex],
+      body: Center(
+        // child: Text(
+        //   'Para Agregar Nuevas Recetas Volver a Presionar el Botón de Nueva Receta',
+        //   textAlign: TextAlign.center,
+        // ),
+        child: RaisedButton(
+          onPressed: () {
+            // Navigate back to the first screen by popping the current route
+            // off the stack.
+            getImage(ImgSource.Camera);
+          },
+          child: Text('Ingresar Nueva Receta'),
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
           items: [
@@ -212,14 +205,15 @@ class _BottomNavBarState extends State<BottomNavBar> {
           onTap: (index) {
             setState(() {
               _currentIndex = index;
-              if (_currentIndex == 1) {
-                getImage(ImgSource.Camera);
-              }
+              // if (_currentIndex == 1) {
+              //   getImage(ImgSource.Camera);
+              // }
               if (_currentIndex == 0) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SecondRoute()),
                 );
+                _currentIndex = 1;
                 // updatePhotos(ImgSource.Gallery);
               }
             });
@@ -250,7 +244,8 @@ class SecondRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Second Route"),
+        title: Text("Mis Recetas"),
+        centerTitle: true,
       ),
       body: Center(),
       bottomNavigationBar: BottomNavigationBar(
