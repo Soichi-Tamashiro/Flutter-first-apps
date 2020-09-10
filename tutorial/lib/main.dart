@@ -178,8 +178,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
         // ),
         child: RaisedButton(
           onPressed: () {
-            // Navigate back to the first screen by popping the current route
-            // off the stack.
             getImage(ImgSource.Camera);
           },
           child: Text('Ingresar Nueva Receta'),
@@ -267,7 +265,7 @@ class SecondRoute extends StatelessWidget {
           selectedItemColor: Colors.amber[800],
           onTap: (index) {
             _currentIndex = index;
-            if (_currentIndex == 1) {
+            if (_currentIndex != 0) {
               Navigator.pop(context);
             }
           }),
